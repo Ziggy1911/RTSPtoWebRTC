@@ -1,3 +1,5 @@
+let stream = new MediaStream();
+
 let suuid = $('#suuid').val();
 
 let config = {
@@ -14,19 +16,12 @@ let log = msg => {
 }
 
 pc.ontrack = function(event) {
+  stream.addTrack(event.track);
+  videoElem.srcObject = stream;
   log(event.streams.length + ' track is delivered')
-  var el = document.createElement(event.track.kind)
-  el.srcObject = event.streams[0]
-  el.muted = true
-  el.autoplay = true
-  el.controls = true
-  el.width = 600
-  document.getElementById('remoteVideos').appendChild(el)
 }
 
 pc.oniceconnectionstatechange = e => log(pc.iceConnectionState)
-
-
 
 async function handleNegotiationNeededEvent() {
   let offer = await pc.createOffer();
@@ -41,23 +36,17 @@ $(document).ready(function() {
 
 
 function getCodecInfo() {
-  $.get("/codec/" + suuid, function(data) {
+  $.get("../codec/" + suuid, function(data) {
     try {
       data = JSON.parse(data);
-      if (data.length > 1) {
-        log('add audio Transceiver')
-        pc.addTransceiver('audio', {
-          'direction': 'sendrecv'
-        })
-      }
     } catch (e) {
       console.log(e);
     } finally {
-
-      log('add video Transceiver')
-      pc.addTransceiver('video', {
-        'direction': 'sendrecv'
-      });
+      $.each(data,function(index,value){
+        pc.addTransceiver(value.Type, {
+          'direction': 'sendrecv'
+        })
+      })
       //send ping becouse PION not handle RTCSessionDescription.close()
       sendChannel = pc.createDataChannel('foo');
       sendChannel.onclose = () => console.log('sendChannel has closed');
@@ -76,22 +65,17 @@ function getCodecInfo() {
 let sendChannel = null;
 
 function getRemoteSdp() {
-  $.post("/recive", {
+  $.post("../receiver/"+ suuid, {
     suuid: suuid,
     data: btoa(pc.localDescription.sdp)
   }, function(data) {
     try {
-
       pc.setRemoteDescription(new RTCSessionDescription({
         type: 'answer',
         sdp: atob(data)
       }))
-
-
-
     } catch (e) {
       console.warn(e);
     }
-
   });
 }

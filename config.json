@@ -1,12 +1,17 @@
 {
   "server": {
-    "http_port": ":8083"
+    "http_port": ":8083",
+    "ice_servers": ["stun:stun.l.google.com:19302"]
   },
   "streams": {
     "frontCam": {
+      "on_demand": false,
+      "disable_audio": true,
       "url": "rtsp://192.168.50.212:8554/front"
     },
     "backCam": {
+      "on_demand": false,
+      "disable_audio": true,
       "url": "rtsp://192.168.50.212:8554/back"
     }
   }

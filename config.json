@@ -9,12 +9,12 @@
     "frontCam": {
       "on_demand": false,
       "disable_audio": true,
-      "url": "rtsp://192.168.50.212:8554/front"
+      "url": "rtsp://192.168.50.113:8554/front"
     },
     "backCam": {
       "on_demand": false,
       "disable_audio": true,
-      "url": "rtsp://192.168.50.212:8554/back"
+      "url": "rtsp://192.168.50.113:8554/back"
     }
   }
 }
